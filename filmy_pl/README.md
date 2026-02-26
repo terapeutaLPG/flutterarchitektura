@@ -20,4 +20,4 @@ dziala apka, zaliczenie
 Architektura i komunikacja między systemami i bazami danych
 Igor 51706
 
-test
+test.

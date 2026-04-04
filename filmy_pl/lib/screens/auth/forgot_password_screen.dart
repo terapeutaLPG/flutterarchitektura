@@ -1,3 +1,4 @@
+import 'package:filmy_pl/services/api_service.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -9,6 +10,26 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
+  bool _loading = false;
+  String? _message;
+  bool _sent = false;
+  Future<void> _send() async {
+    setState(() {
+      _loading = true;
+      _message = null;
+    });
+    try {
+      final result = await ApiService.forgotPassword(_emailCtrl.text.trim());
+      setState(() {
+        _sent = true;
+        _message = result['message'] ?? result['error'] ?? 'Wyslano';
+      });
+    } catch (e) {
+      setState(() => _message = 'Blad polaczenia z serwerem');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -71,6 +92,45 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 40),
+              if (_message != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: _sent
+                        ? const Color(0xFF39D3FF).withOpacity(0.15)
+                        : const Color(0xFFFF6B7A).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _sent
+                          ? const Color(0xFF39D3FF).withOpacity(0.4)
+                          : const Color(0xFFFF6B7A).withOpacity(0.4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _sent
+                            ? Icons.check_circle_outline
+                            : Icons.error_outline,
+                        color: _sent
+                            ? const Color(0xFF39D3FF)
+                            : const Color(0xFFFF6B7A),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(_message!,
+                            style: TextStyle(
+                                color: _sent
+                                    ? const Color(0xFF39D3FF)
+                                    : const Color(0xFFFF6B7A),
+                                fontSize: 13)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
@@ -85,8 +145,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 28),
               ElevatedButton(
-                onPressed: null,
-                child: const Text('Wyslij link'),
+                onPressed: _loading ? null : _send,
+                child: _loading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation(Color(0xFF0A0C12))),
+                      )
+                    : const Text('Wyslij link'),
               ),
             ],
           ),

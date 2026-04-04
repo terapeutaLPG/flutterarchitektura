@@ -54,7 +54,6 @@ class ApiService {
     throw Exception(data['error'] ?? 'Błąd pobierania filmów');
   }
 
-  // ===== LAJKI =====
   static Future<Map<String, dynamic>> getLikeStatus(String filename) async {
     final token = await AuthService.getToken();
     final response = await http.get(
@@ -73,7 +72,6 @@ class ApiService {
     return jsonDecode(response.body);
   }
 
-  // ===== KOMENTARZE =====
   static Future<List<Comment>> getComments(String filename) async {
     final token = await AuthService.getToken();
     final response = await http.get(
@@ -101,6 +99,15 @@ class ApiService {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({'content': content}),
+    );
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl?endpoint=forgot_password'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
     );
     return jsonDecode(response.body);
   }

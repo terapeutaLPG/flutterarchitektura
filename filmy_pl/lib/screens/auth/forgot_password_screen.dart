@@ -13,19 +13,37 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _loading = false;
   String? _message;
   bool _sent = false;
+
   Future<void> _send() async {
     setState(() {
       _loading = true;
       _message = null;
+      _sent = false;
     });
     try {
       final result = await ApiService.forgotPassword(_emailCtrl.text.trim());
       setState(() {
-        _sent = true;
-        _message = result['message'] ?? result['error'] ?? 'Wyslano';
+        _sent = result['success'] == true;
+        final rawMessage = result['error'] ?? result['message'];
+        final normalized = rawMessage?.toString().toLowerCase();
+
+        if (!_sent &&
+            normalized != null &&
+            normalized.contains('unknown endpoint')) {
+          _message = 'Serwer nie obsluguje resetu hasla.';
+        } else {
+          _message = _sent
+              ? (result['message'] ?? 'Wyslano link resetujacy')
+              : (result['error'] ??
+                  result['message'] ??
+                  'Nie udalo sie wyslac linku');
+        }
       });
     } catch (e) {
-      setState(() => _message = 'Blad polaczenia z serwerem');
+      setState(() {
+        _sent = false;
+        _message = 'Blad polaczenia z serwerem';
+      });
     } finally {
       if (mounted) setState(() => _loading = false);
     }

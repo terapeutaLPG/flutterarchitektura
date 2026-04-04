@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../home_screen.dart';
+import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,7 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
 
   Future<void> _login() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final result = await ApiService.login(
         _emailCtrl.text.trim(),
@@ -131,8 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined,
-                      color: Color(0xFFA2A8B8)),
+                  prefixIcon:
+                      Icon(Icons.email_outlined, color: Color(0xFFA2A8B8)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -143,8 +147,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 onSubmitted: (_) => _login(),
                 decoration: InputDecoration(
                   labelText: 'Hasło',
-                  prefixIcon: const Icon(Icons.lock_outline,
-                      color: Color(0xFFA2A8B8)),
+                  prefixIcon:
+                      const Icon(Icons.lock_outline, color: Color(0xFFA2A8B8)),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscure ? Icons.visibility_off : Icons.visibility,
@@ -152,6 +156,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordScreen(),
+                    ),
+                  ),
+                  child: const Text('Nie pamietasz hasla?'),
                 ),
               ),
               const SizedBox(height: 28),
@@ -163,8 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation(Color(0xFF0A0C12)),
+                          valueColor: AlwaysStoppedAnimation(Color(0xFF0A0C12)),
                         ),
                       )
                     : const Text('Zaloguj się'),
@@ -174,8 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const RegisterScreen()),
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
                   ),
                   child: RichText(
                     text: TextSpan(
